@@ -1,0 +1,190 @@
+{
+  "triggerConfigs": [{
+    "label": "API Trigger",
+    "startTasks": [{
+      "taskId": "2"
+    }],
+    "properties": {
+      "Trigger name": "cloudlogging_API_1"
+    },
+    "triggerType": "API",
+    "triggerNumber": "1",
+    "triggerId": "api_trigger/cloudlogging_API_1"
+  }],
+  "taskConfigs": [{
+    "task": "GenericRestV2Task",
+    "taskId": "1",
+    "parameters": {
+      "throwError": {
+        "key": "throwError",
+        "value": {
+          "booleanValue": true
+        }
+      },
+      "responseBody": {
+        "key": "responseBody",
+        "value": {
+          "stringArray": {
+            "stringValues": ["$`Task_1_responseBody`$"]
+          }
+        }
+      },
+      "disableSSLValidation": {
+        "key": "disableSSLValidation",
+        "value": {
+          "booleanValue": false
+        }
+      },
+      "httpParams": {
+        "key": "httpParams",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.proto.ParameterMap\",\n  \"entries\": [{\n    \"key\": {\n      \"literalValue\": {\n        \"stringValue\": \"content-type\"\n      }\n    },\n    \"value\": {\n      \"literalValue\": {\n        \"stringValue\": \"application/json\"\n      }\n    }\n  }]\n}"
+        }
+      },
+      "authConfig": {
+        "key": "authConfig",
+        "value": {
+          "jsonValue": "{\n  \"@type\": \"type.googleapis.com/enterprise.crm.eventbus.authconfig.AuthConfigTaskParam\",\n  \"authConfigId\": \"6a6aed7a-6318-41b7-805a-83b122859576\"\n}"
+        }
+      },
+      "responseHeader": {
+        "key": "responseHeader",
+        "value": {
+          "stringArray": {
+            "stringValues": ["$`Task_1_responseHeader`$"]
+          }
+        }
+      },
+      "userAgent": {
+        "key": "userAgent",
+        "value": {
+          "stringValue": ""
+        }
+      },
+      "httpMethod": {
+        "key": "httpMethod",
+        "value": {
+          "stringValue": "POST"
+        }
+      },
+      "responseStatus": {
+        "key": "responseStatus",
+        "value": {
+          "stringArray": {
+            "stringValues": ["$`Task_1_responseStatus`$"]
+          }
+        }
+      },
+      "url": {
+        "key": "url",
+        "value": {
+          "stringValue": "https://logging.googleapis.com/v2/entries:write"
+        }
+      },
+      "urlFetchingService": {
+        "key": "urlFetchingService",
+        "value": {
+          "stringValue": "HARPOON"
+        }
+      },
+      "useSSL": {
+        "key": "useSSL",
+        "value": {
+          "booleanValue": false
+        }
+      },
+      "requestorId": {
+        "key": "requestorId",
+        "value": {
+          "stringValue": ""
+        }
+      },
+      "urlQueryStrings": {
+        "key": "urlQueryStrings"
+      },
+      "requestBody": {
+        "key": "requestBody",
+        "value": {
+          "stringValue": "$logEntry$"
+        }
+      },
+      "followRedirects": {
+        "key": "followRedirects",
+        "value": {
+          "booleanValue": true
+        }
+      },
+      "additionalHeaders": {
+        "key": "additionalHeaders"
+      }
+    },
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Log Entry"
+  }, {
+    "task": "JavaScriptTask",
+    "taskId": "2",
+    "parameters": {
+      "script": {
+        "key": "script",
+        "value": {
+          "stringValue": "\n/**\n * Function that is called during the JavaScript Task execution.\n * @param {IntegrationEvent} event\n */\nfunction executeScript(event) {\n\n    //enter the list of all the variables to log\n    var logVariables \u003d [\"sample1\", \"sample2\", \"sample3\"];\n\n    var logEntry \u003d event.getParameter(\"logEntry\");\n\n    //set the labels that identify the integration\n    logEntry.labels.projectId \u003d event.getGcpProjectId();\n    logEntry.labels.integrationName \u003d event.getIntegrationName();\n    logEntry.labels.location \u003d event.getRegion();\n    logEntry.labels.executionId \u003d event.getEventExecutionInfoId();\n\n    //for each variable to log, create a log entry\n    logVariables.forEach(function(variableName, index){\n        var v \u003d event.getParameter(variableName);\n\n        if (typeof v !\u003d \"undefined\") {\n            //initialize log entry\n            logEntry.entries[index] \u003d {};\n            //label each log entry\n            logEntry.entries[index].logName \u003d \"projects/\" + event.getGcpProjectId() + \"/logs/\" + event.getIntegrationName();\n            //initialize the resource\n            logEntry.entries[index].resource \u003d {};\n            logEntry.entries[index].resource.type \u003d \"global\";\n            logEntry.entries[index].resource.labels \u003d logEntry.labels;\n            //check the type of the variable\n            if (typeof v \u003d\u003d \"string\") {\n                logEntry.entries[index].textPayload \u003d v;\n            } else if (typeof v \u003d\u003d \"object\") {\n                logEntry.entries[index].jsonPayload \u003d v;\n            } else if ((typeof v \u003d\u003d \"boolean\") || (typeof v \u003d\u003d \"number\")) {\n                logEntry.entries[index].textPayload \u003d v.toString();\n            }\n        } else {\n            event.log(\"warning: log variable \" + variableName + \" not found\");\n        }\n    });\n\n    event.setParameter(\"logEntry\", logEntry);\n}\n"
+        }
+      }
+    },
+    "nextTasks": [{
+      "taskId": "1"
+    }],
+    "taskExecutionStrategy": "WHEN_ALL_SUCCEED",
+    "displayName": "Set Cloud Logging Params"
+  }],
+  "integrationParameters": [{
+    "key": "`Task_1_responseHeader`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_1_responseHeader`",
+    "isTransient": true,
+    "producer": "1_1"
+  }, {
+    "key": "`Task_1_responseBody`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_1_responseBody`",
+    "isTransient": true,
+    "producer": "1_1"
+  }, {
+    "key": "`Task_1_responseStatus`",
+    "dataType": "STRING_VALUE",
+    "displayName": "`Task_1_responseStatus`",
+    "isTransient": true,
+    "producer": "1_1"
+  }, {
+    "key": "sample1",
+    "dataType": "STRING_VALUE",
+    "defaultValue": {
+      "stringValue": "test"
+    },
+    "displayName": "sample1"
+  }, {
+    "key": "sample2",
+    "dataType": "BOOLEAN_VALUE",
+    "defaultValue": {
+      "booleanValue": true
+    },
+    "displayName": "sample2"
+  }, {
+    "key": "sample3",
+    "dataType": "JSON_VALUE",
+    "defaultValue": {
+      "jsonValue": "{\n  \"msg\": \"nandan\"\n}"
+    },
+    "displayName": "sample3",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"msg\": {\n      \"type\": \"string\"\n    }\n  }\n}"
+  }, {
+    "key": "logEntry",
+    "dataType": "JSON_VALUE",
+    "defaultValue": {
+      "jsonValue": "{\n  \"labels\": {\n    \"projectId\": \"\",\n    \"integrationName\": \"\"\n  },\n  \"entries\": [{\n    \"logName\": \"projects/project-id/logs/log-id\",\n    \"resource\": {\n      \"type\": \"global\",\n      \"labels\": {\n        \"projectId\": \"\",\n        \"integrationName\": \"\"\n      }\n    },\n    \"labels\": {\n      \"projectId\": \"\",\n      \"integrationName\": \"\"\n    },\n    \"severity\": \"DEFAULT\",\n    \"textPayload\": \"\",\n    \"jsonPayload\": {\n    }\n  }],\n  \"partialSuccess\": true,\n  \"dryRun\": false\n}"
+    },
+    "displayName": "logEntry",
+    "jsonSchema": "{\n  \"$schema\": \"http://json-schema.org/draft-04/schema#\",\n  \"type\": \"object\",\n  \"properties\": {\n    \"entries\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"severity\": {\n            \"type\": \"string\"\n          },\n          \"logName\": {\n            \"type\": \"string\"\n          },\n          \"resource\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"type\": {\n                \"type\": \"string\"\n              },\n              \"labels\": {\n                \"type\": \"object\",\n                \"properties\": {\n                  \"integrationName\": {\n                    \"type\": \"string\"\n                  },\n                  \"projectId\": {\n                    \"type\": \"string\"\n                  }\n                }\n              }\n            }\n          },\n          \"jsonPayload\": {\n            \"type\": \"object\"\n          },\n          \"textPayload\": {\n            \"type\": \"string\"\n          },\n          \"labels\": {\n            \"type\": \"object\",\n            \"properties\": {\n              \"integrationName\": {\n                \"type\": \"string\"\n              },\n              \"projectId\": {\n                \"type\": \"string\"\n              }\n            }\n          }\n        }\n      }\n    },\n    \"dryRun\": {\n      \"type\": \"boolean\"\n    },\n    \"partialSuccess\": {\n      \"type\": \"boolean\"\n    },\n    \"labels\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"integrationName\": {\n          \"type\": \"string\"\n        },\n        \"projectId\": {\n          \"type\": \"string\"\n        }\n      }\n    }\n  }\n}"
+  }],
+  "userLabel": "1"
+}

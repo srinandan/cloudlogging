@@ -1,0 +1,12 @@
+{
+    "displayName": "logging-authconfig",
+    "description": "this SA has permissions to write to cloud logging",
+    "visibility": "CLIENT_VISIBLE",
+    "decryptedCredential": {
+      "credentialType": "SERVICE_ACCOUNT",
+      "serviceAccountCredentials": {
+        "serviceAccount": "<my-service-account>@<project-id>.iam.gserviceaccount.com",
+        "scope": "https://www.googleapis.com/auth/cloud-platform"
+      }
+    }
+}

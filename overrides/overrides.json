@@ -1,0 +1,14 @@
+{
+    "task_overrides": [{
+        "taskId": "1",
+        "task": "GenericRestV2Task",
+        "parameters":  {
+            "authConfig": {
+                "key": "authConfig",
+                "value": {
+                    "stringValue": "logging-authconfig"
+                }
+            }
+        }
+    }]
+}
