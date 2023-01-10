@@ -4,7 +4,7 @@ This sample repository demonstrates how to log from [Application Integration](ht
 
 # Description
 
-Application Integration sends logs (also known as execution logs) to the `executions` entity. You can try the API [here](https://cloud.google.com/application-integration/docs/reference/rest/v1/projects.locations.integrations.executions/list). But some customers may want to send this information to Cloud Logging. This sample shows how to send integration information to Cloud Logging.
+Application Integration sends logs (also known as execution logs) to the `executions` entity. You can try the API [here](https://cloud.google.com/application-integration/docs/reference/rest/v1/projects.locations.integrations.executions/list). But some customers may want to send customer information (Application Integration variables) to Cloud Logging. This sample shows how to send such information to Cloud Logging.
 
 ## Using the Integration
 
